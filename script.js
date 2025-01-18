@@ -1,5 +1,5 @@
- // Botones para seleccionar imágenes o carpetas
- document.getElementById('selectImagesBtn').addEventListener('click', function () {
+// Botones para seleccionar imágenes o carpetas
+document.getElementById('selectImagesBtn').addEventListener('click', function () {
     const input = document.getElementById('inputImagenes');
     input.value = '';
     input.click();
@@ -33,10 +33,13 @@ function hideLoading() {
 }
 
 // Procesar archivos seleccionados
-// Procesar archivos seleccionados
 function handleFileSelection(files, isFolder) {
     resetView(); // Limpiar vistas y listas previas
     showLoading(); // Mostrar mensaje de cargando al iniciar el procesamiento
+
+    // Ocultar el botón de "Descargar Todo" inmediatamente
+    const bulkResizeContainer = document.getElementById('bulkResizeContainer');
+    bulkResizeContainer.style.display = 'none';
 
     if (!files || files.length === 0) {
         hideLoading(); // Ocultar mensaje si no hay archivos
@@ -90,6 +93,133 @@ function handleFileSelection(files, isFolder) {
         }
     });
 
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             // Convertir la imagen
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' && isFolder ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') validImages.push(listItem);
+    //                 else invalidImages.push(listItem);
+    //                 if (!isFolder && totalFiles === 1 && status === 'no cumple') {
+    //                     const imageContainer = document.getElementById('imageContainer');
+    //                     imageContainer.style.display = 'flex';
+    //                     imageContainer.style.flexDirection = 'row'; // Colocar elementos en fila
+    //                     imageContainer.style.alignItems = 'center';
+    //                     imageContainer.style.justifyContent = 'center'; // Centrar la fila
+    //                     imageContainer.style.gap = '20px'; // Espaciado entre imagen y texto
+    //                     imageContainer.style.marginTop = '20px';
+
+
+    //                     // Mostrar la imagen ajustada
+    //                     const preview = document.getElementById('preview');
+    //                     preview.style.display = 'block';
+    //                     preview.style.maxWidth = '300px';
+    //                     preview.style.maxHeight = '400px';
+    //                     preview.src = jpegUrl;
+
+    //                     // Mostrar las nuevas dimensiones, peso, formato y botón en un contenedor
+    //                     const previewInfo = document.getElementById('previewInfo');
+    //                     if (previewInfo) {
+    //                         previewInfo.style.display = 'block';
+    //                         previewInfo.innerHTML = `
+    //                             <div style="text-align: justify; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    //                                 <p><strong>Vista previa:</strong></p>
+    //                                 <p><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar" style="background: none; border: none; cursor: pointer; font-size: 24px;">
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+    //                     } else {
+    //                         const info = document.createElement('div');
+    //                         info.id = 'previewInfo';
+    //                         info.style.marginLeft = '10px'; // Margen a la izquierda de la imagen
+    //                         info.style.padding = '10px'; // Espaciado interno
+    //                         info.style.border = '1px solid #ccc'; // Bordes
+    //                         info.style.borderRadius = '5px'; // Bordes redondeados
+    //                         info.style.textAlign = 'justify'; // Justificar texto
+    //                         info.style.backgroundColor = '#f9f9f9'; // Fondo claro
+    //                         info.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; // Sombra ligera
+    //                         info.style.display = 'block'; // Bloque para manejar el contenido fácilmente
+
+    //                         info.innerHTML = `
+    //                             <div style="text-align: center;">
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar"
+    //                                     style="background: none;  border-radius: 5px; cursor: pointer; font-size: 18px; padding: 10px; display: inline-flex; align-items: center; gap: 8px;">
+    //                                     <strong style="color: green;">DESCARGAR</strong>
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+
+    //                         imageContainer.appendChild(info);
+    //                     }
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons();
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
     function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileName = file.name.toLowerCase();
@@ -111,27 +241,27 @@ function handleFileSelection(files, isFolder) {
                     errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
                 }
     
+                if (fileSizeKB > 30) {
+                    status = 'no cumple';
+                    errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+                }
+    
                 if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
                     status = 'no cumple';
                     errors.push('Formato no compatible');
                 }
     
-                // Convertir la imagen
                 convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
                     const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
-                    if (transformedSizeKB > 30) {
-                        status = 'no cumple';
-                        errors.push(`Tamaño convertido mayor a 30 KB (${transformedSizeKB} KB)`);
-                    }
     
                     const listItem = `
                         <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
-                            <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'};">
+                            <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
                                 Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
                             </p>
                             ${status === 'no cumple' ? `
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span>Descargar ajustada</span>
+                            <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+                                <span>Descargar Ajustada</span>
                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
                                     📥
                                 </button>
@@ -139,43 +269,78 @@ function handleFileSelection(files, isFolder) {
                         </li>
                     `;
     
-                    if (status === 'cumple') validImages.push(listItem);
-                    else invalidImages.push(listItem);
-    
-                    if (!isFolder && totalFiles === 1) {
-                        const imageContainer = document.getElementById('imageContainer');
-                        imageContainer.style.display = 'flex'; // Usar flexbox para centrar
-                        imageContainer.style.flexDirection = 'column'; // Organizar título e imagen en columna
-                        imageContainer.style.alignItems = 'center'; // Centrar horizontalmente
-                        imageContainer.style.justifyContent = 'center'; // Centrar verticalmente
-                        imageContainer.style.marginTop = '20px'; // Margen superior
-                    
-                        // Agregar el título "Vista Previa"
-                        const previewTitle = document.getElementById('previewTitle');
-                        if (previewTitle) {
-                            previewTitle.style.display = 'block'; // Mostrar el título si ya existe
-                        } else {
-                            const title = document.createElement('h3');
-                            title.id = 'previewTitle';
-                            title.textContent = 'Vista Previa';
-                            title.style.marginBottom = '10px'; // Margen inferior
-                            imageContainer.prepend(title); // Agregar el título al contenedor
+                    if (status === 'cumple') {
+                        validImages.push(listItem);
+                        // Mostrar imagen cuando cumple y es una sola imagen
+                        if (!isFolder && totalFiles === 1) {
+                            displaySingleImage(e.target.result, null);
                         }
-                    
-                        // Mostrar la imagen en el contenedor
-                        const preview = document.getElementById('preview');
-                        preview.style.display = 'block';
-                        preview.style.maxWidth = '100%'; // Ajustar al ancho disponible
-                        preview.style.maxHeight = '400px'; // Limitar la altura
-                        preview.src = jpegUrl; // Mostrar la imagen convertida
+                    } else {
+                        invalidImages.push(listItem);
+                        // Mostrar imagen e información cuando no cumple y es una sola imagen
+                        if (!isFolder && totalFiles === 1) {
+                            displaySingleImage(jpegUrl, {
+                                dimensiones: '300x400',
+                                tamaño: `${transformedSizeKB} KB`,
+                                formato: 'JPEG',
+                            });
+                        }
                     }
-                    
+    
+                    // Mostrar el botón "Descargar Todo" si no es carpeta y hay más de 2 imágenes que no cumplen
+                    if (!isFolder && invalidImages.length >= 2) {
+                        const bulkResizeContainer = document.getElementById('bulkResizeContainer');
+                        bulkResizeContainer.style.display = 'block';
+    
+                        // Crear botón si no existe
+                        let bulkResizeBtn = document.getElementById('bulkResizeBtn');
+                        if (!bulkResizeBtn) {
+                            bulkResizeBtn = document.createElement('button');
+                            bulkResizeBtn.id = 'bulkResizeBtn';
+                            bulkResizeBtn.textContent = 'Descargar Todo';
+                            bulkResizeBtn.style.marginTop = '10px';
+                            bulkResizeBtn.style.padding = '10px';
+                            bulkResizeBtn.style.backgroundColor = '#4CAF50';
+                            bulkResizeBtn.style.color = 'white';
+                            bulkResizeBtn.style.border = 'none';
+                            bulkResizeBtn.style.borderRadius = '5px';
+                            bulkResizeBtn.style.cursor = 'pointer';
+    
+                            bulkResizeBtn.addEventListener('click', async function () {
+                                bulkResizeBtn.disabled = true; // Deshabilitar botón
+                                bulkResizeBtn.textContent = 'Procesando....'; // Cambiar texto del botón
+                                bulkResizeBtn.style.cursor = 'not-allowed';
+    
+                                const invalidImagesData = Array.from(
+                                    document.querySelectorAll('.no-cumple .resize-btn')
+                                ).map((button) => ({
+                                    src: button.dataset.src,
+                                    fileName: button.dataset.file,
+                                }));
+    
+                                await resizeAndDownloadAllInvalid(invalidImagesData);
+    
+                                bulkResizeBtn.disabled = false; // Habilitar botón
+                                bulkResizeBtn.textContent = 'Descargar Todo'; // Restaurar texto del botón
+                                bulkResizeBtn.style.cursor = 'pointer';
+                            });
+    
+                            bulkResizeContainer.appendChild(bulkResizeBtn);
+                        }
+                    }
     
                     processedCount++;
                     if (processedCount === totalFiles) {
                         updateList(validImages, invalidImages, isFolder);
-                        bindResizeButtons(); // Asociar eventos a los botones
-                        hideLoading(); // Ocultar mensaje de cargando
+    
+                        // Asegurar que el botón no se oculte si hay más de 2 imágenes que no cumplen
+                        if (!isFolder && invalidImages.length >= 2) {
+                            const bulkResizeContainer = document.getElementById('bulkResizeContainer');
+                            bulkResizeContainer.style.display = 'block';
+                        }
+    
+                        bindResizeButtons();
+                        hideLoading();
                     }
                 });
             };
@@ -185,9 +350,263 @@ function handleFileSelection(files, isFolder) {
     
         reader.readAsDataURL(file);
     }
-    
-    
-    
+    // Función para mostrar una sola imagen
+    function displaySingleImage(imageUrl, info) {
+        const imageContainer = document.getElementById('imageContainer');
+        imageContainer.style.display = 'flex';
+        imageContainer.style.flexDirection = 'row';
+        imageContainer.style.alignItems = 'center';
+        imageContainer.style.justifyContent = 'center';
+        imageContainer.style.gap = '20px';
+        imageContainer.style.marginTop = '20px';
+
+        const preview = document.getElementById('preview');
+        preview.style.display = 'block';
+        preview.style.maxWidth = '300px';
+        preview.style.maxHeight = '400px';
+        preview.src = imageUrl;
+
+        // Mostrar información adicional si no cumple
+        const existingInfo = document.getElementById('previewInfo');
+        if (existingInfo) {
+            existingInfo.remove();
+        }
+
+        if (info) {
+            const infoContainer = document.createElement('div');
+            infoContainer.id = 'previewInfo';
+            infoContainer.style.marginLeft = '10px';
+            infoContainer.style.padding = '10px';
+            infoContainer.style.border = '1px solid #ccc';
+            infoContainer.style.borderRadius = '5px';
+            infoContainer.style.textAlign = 'justify';
+            infoContainer.style.backgroundColor = '#f9f9f9';
+            infoContainer.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+
+            infoContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <p style="text-align: justify; margin: 5px 10px;"><strong>Dimensiones:</strong> ${info.dimensiones}</p>
+                    <p style="text-align: justify; margin: 5px 10px;"><strong>Tamaño:</strong> ${info.tamaño}</p>
+                    <p style="text-align: justify; margin: 5px 10px;"><strong>Formato:</strong> ${info.formato}</p>
+                </div>
+            `;
+            //     <div style="text-align: center;">
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Dimensiones:</strong> ${info.dimensiones}</p>
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Tamaño:</strong> ${info.tamaño}</p>
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Formato:</strong> ${info.formato}</p>
+            // </div>
+
+            imageContainer.appendChild(infoContainer);
+        }
+    }
+
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') {
+    //                     validImages.push(listItem);
+    //                 } else {
+    //                     invalidImages.push(listItem);
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons(); // Enlazar eventos después de actualizar la lista
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
+
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             // Convertir la imagen
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' && isFolder ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') {
+    //                     validImages.push(listItem);
+    //                     // Mostrar solo la imagen cuando cumple y es una única imagen
+    //                     if (!isFolder && totalFiles === 1) {
+    //                         const imageContainer = document.getElementById('imageContainer');
+    //                         imageContainer.style.display = 'flex';
+    //                         imageContainer.style.justifyContent = 'center';
+    //                         imageContainer.style.marginTop = '20px';
+
+    //                         const preview = document.getElementById('preview');
+    //                         preview.style.display = 'block';
+    //                         preview.style.maxWidth = '300px';
+    //                         preview.style.maxHeight = '400px';
+    //                         preview.src = e.target.result;
+
+    //                         // Asegurarse de que no se muestre información adicional
+    //                         const existingInfo = document.getElementById('previewInfo');
+    //                         if (existingInfo) {
+    //                             existingInfo.remove();
+    //                         }
+    //                     }
+    //                 } else {
+    //                     invalidImages.push(listItem);
+    //                     // Mostrar imagen e información cuando no cumple y es una única imagen
+    //                     if (!isFolder && totalFiles === 1) {
+    //                         const imageContainer = document.getElementById('imageContainer');
+    //                         imageContainer.style.display = 'flex';
+    //                         imageContainer.style.flexDirection = 'row';
+    //                         imageContainer.style.alignItems = 'center';
+    //                         imageContainer.style.justifyContent = 'center';
+    //                         imageContainer.style.gap = '20px';
+    //                         imageContainer.style.marginTop = '20px';
+
+    //                         const preview = document.getElementById('preview');
+    //                         preview.style.display = 'block';
+    //                         preview.style.maxWidth = '300px';
+    //                         preview.style.maxHeight = '400px';
+    //                         preview.src = jpegUrl;
+
+    //                         const info = document.createElement('div');
+    //                         info.id = 'previewInfo';
+    //                         info.style.marginLeft = '10px';
+    //                         info.style.padding = '10px';
+    //                         info.style.border = '1px solid #ccc';
+    //                         info.style.borderRadius = '5px';
+    //                         info.style.textAlign = 'justify';
+    //                         info.style.backgroundColor = '#f9f9f9';
+    //                         info.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+    //                         info.style.display = 'block';
+
+    //                         info.innerHTML = `
+    //                             <div style="text-align: center;">
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar"
+    //                                     style="background: none; border-radius: 5px; cursor: pointer; font-size: 18px; padding: 10px; display: inline-flex; align-items: center; gap: 8px;">
+    //                                     <strong style="color: green;">DESCARGAR</strong>
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+
+    //                         // Limpiar el contenedor de información previa
+    //                         const existingInfo = document.getElementById('previewInfo');
+    //                         if (existingInfo) {
+    //                             existingInfo.remove();
+    //                         }
+
+    //                         imageContainer.appendChild(info);
+    //                     }
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons();
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
 }
 
 function convertToJpeg(image, originalName, callback) {
@@ -221,7 +640,6 @@ function convertToJpeg(image, originalName, callback) {
     tryConversion();
 }
 
-
 // Asociar eventos a los botones de redimensionar
 function bindResizeButtons() {
     const buttons = document.querySelectorAll('.resize-btn');
@@ -237,7 +655,6 @@ function bindResizeButtons() {
         });
     });
 }
-
 
 // Redimensionar y descargar la imagen
 function resizeAndDownload(src, fileName) {
@@ -274,6 +691,16 @@ function resetView() {
     preview.src = '';
 }
 
+bulkResizeBtn.addEventListener('mouseover', function () {
+    bulkResizeBtn.style.backgroundColor = '#45a049'; // Cambia el color de fondo
+    bulkResizeBtn.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)'; // Agrega sombra
+});
+
+bulkResizeBtn.addEventListener('mouseout', function () {
+    bulkResizeBtn.style.backgroundColor = '#4CAF50'; // Restaura el color original
+    bulkResizeBtn.style.boxShadow = 'none'; // Quita la sombra
+});
+
 // Actualizar lista de resultados
 function updateList(validImages, invalidImages, isFolder) {
     const cumplenContainer = document.getElementById('cumplenContainer');
@@ -300,13 +727,13 @@ function updateList(validImages, invalidImages, isFolder) {
             <ul>${invalidImages.join('')}</ul>`;
         noCumplenContainer.style.display = 'block';
 
-        // Mostrar el botón de redimensionar y descargar todo solo si se analizó una carpeta
-        if (isFolder) {
+        // Mostrar el botón de redimensionar y descargar todo solo si hay más de una imagen
+        if (isFolder && invalidImages.length >= 2) {
             bulkResizeContainer.style.display = 'block'; // Asegurarse de que el contenedor sea visible
             if (!document.getElementById('bulkResizeBtn')) {
                 const bulkResizeBtn = document.createElement('button');
                 bulkResizeBtn.id = 'bulkResizeBtn';
-                bulkResizeBtn.textContent = 'Redimensionar y Descargar Todo';
+                bulkResizeBtn.textContent = 'Descargar Todo';
                 bulkResizeBtn.style.marginTop = '10px';
                 bulkResizeBtn.style.padding = '10px';
                 bulkResizeBtn.style.backgroundColor = '#4CAF50';
@@ -317,7 +744,7 @@ function updateList(validImages, invalidImages, isFolder) {
 
                 bulkResizeBtn.addEventListener('click', async function () {
                     bulkResizeBtn.disabled = true; // Deshabilitar botón
-                    bulkResizeBtn.textContent = 'Redimensionando'; // Cambiar texto del botón
+                    bulkResizeBtn.textContent = 'Procesando....'; // Cambiar texto del botón
                     bulkResizeBtn.style.cursor = 'not-allowed';
 
                     const invalidImagesData = Array.from(
@@ -330,22 +757,20 @@ function updateList(validImages, invalidImages, isFolder) {
                     await resizeAndDownloadAllInvalid(invalidImagesData);
 
                     bulkResizeBtn.disabled = false; // Habilitar botón
-                    bulkResizeBtn.textContent = 'Redimensionar y Descargar Todo'; // Restaurar texto del botón
+                    bulkResizeBtn.textContent = 'Descargar Todo'; // Restaurar texto del botón
                     bulkResizeBtn.style.cursor = 'pointer';
                 });
 
                 bulkResizeContainer.appendChild(bulkResizeBtn);
             }
         } else {
-            bulkResizeContainer.style.display = 'none'; // Ocultar el contenedor si no se analizó una carpeta
+            bulkResizeContainer.style.display = 'none'; // Ocultar el contenedor si no se cumplen las condiciones
         }
     } else {
         noCumplenContainer.style.display = 'none';
         bulkResizeContainer.style.display = 'none';
     }
 }
-
-
 
 async function resizeAndDownloadAllInvalid(invalidImagesData) {
     const zip = new JSZip(); // Crear el archivo ZIP
@@ -401,6 +826,3 @@ async function resizeAndDownloadAllInvalid(invalidImagesData) {
     link.download = 'imagenes-ajustadas.zip';
     link.click();
 }
-
-
-
