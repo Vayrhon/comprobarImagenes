@@ -54,6 +54,7 @@ function handleFileSelection(files, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileType = file.type;
         const fileName = file.name.toLowerCase();
+        const formato = fileName.split('.').pop().toUpperCase(); // Extraer formato del archivo
 
         if (!fileType.startsWith('image/') && !fileName.endsWith('.heic')) {
             // Ignorar archivos no compatibles
@@ -77,7 +78,7 @@ function handleFileSelection(files, isFolder) {
                         fileName.replace('.heic', '.jpg'),
                         { type: 'image/jpeg' }
                     );
-                    processImage(convertedFile, validImages, invalidImages, files.length, isFolder);
+                    processImage(convertedFile, formato, validImages, invalidImages, files.length, isFolder);
                 })
                 .catch((error) => {
                     console.error('Error al convertir HEIC:', error);
@@ -89,14 +90,15 @@ function handleFileSelection(files, isFolder) {
                 });
         } else {
             // Procesar imágenes que no son HEIC
-            processImage(file, validImages, invalidImages, files.length, isFolder);
+            processImage(file, formato, validImages, invalidImages, files.length, isFolder);
         }
     });
 
     
-    function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    function processImage(file, formato, validImages, invalidImages, totalFiles, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileName = file.name.toLowerCase();
+        console.log(formato)
     
         const reader = new FileReader();
     
@@ -124,14 +126,15 @@ function handleFileSelection(files, isFolder) {
                     status = 'no cumple';
                     errors.push('Formato no compatible');
                 }
-    
+                const nombre = fileName.split('.').slice(0, -1).join('.'); // Obtener el nombre sin la extensión
+
                 convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
                     const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
     
                     const listItem = `
                         <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
                             <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
-                                Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+                                Nombre: <strong>${nombre}.${formato} </strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
                             </p>
                             ${status === 'no cumple' ? `
                             <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
