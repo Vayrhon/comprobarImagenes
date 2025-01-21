@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificar imágenes</title>
+    <title>Redimg</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
+
 <body>
     <div class="container">
-        <h1>Selecciona imágenes o una carpeta para analizar</h1>
+        <h1>Selecciona imágenes o una carpeta para procesar</h1>
 
         <!-- Botones para abrir exploradores -->
         <button id="selectImagesBtn">Seleccionar imágenes</button>
@@ -45,4 +50,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
