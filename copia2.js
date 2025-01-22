@@ -13,12 +13,12 @@ document.getElementById('selectFolderBtn').addEventListener('click', function ()
 
 // Manejo de selección de imágenes
 document.getElementById('inputImagenes').addEventListener('change', function (event) {
-
+    console.log("Imágenes seleccionadas");
     handleFileSelection(event.target.files, false);
 });
 
 document.getElementById('inputCarpeta').addEventListener('change', function (event) {
-
+    console.log("Carpeta seleccionada");
     handleFileSelection(event.target.files, true);
 });
 
@@ -98,6 +98,7 @@ function handleFileSelection(files, isFolder) {
     function processImage(file, formato, validImages, invalidImages, totalFiles, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileName = file.name.toLowerCase();
+        console.log(formato)
     
         const reader = new FileReader();
     
