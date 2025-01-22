@@ -13,12 +13,12 @@ document.getElementById('selectFolderBtn').addEventListener('click', function ()
 
 // Manejo de selección de imágenes
 document.getElementById('inputImagenes').addEventListener('change', function (event) {
-
+    console.log("Imágenes seleccionadas");
     handleFileSelection(event.target.files, false);
 });
 
 document.getElementById('inputCarpeta').addEventListener('change', function (event) {
-
+    console.log("Carpeta seleccionada");
     handleFileSelection(event.target.files, true);
 });
 
@@ -54,7 +54,6 @@ function handleFileSelection(files, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileType = file.type;
         const fileName = file.name.toLowerCase();
-        const formato = fileName.split('.').pop().toUpperCase(); // Extraer formato del archivo
 
         if (!fileType.startsWith('image/') && !fileName.endsWith('.heic')) {
             // Ignorar archivos no compatibles
@@ -78,7 +77,7 @@ function handleFileSelection(files, isFolder) {
                         fileName.replace('.heic', '.jpg'),
                         { type: 'image/jpeg' }
                     );
-                    processImage(convertedFile, formato, validImages, invalidImages, files.length, isFolder);
+                    processImage(convertedFile, validImages, invalidImages, files.length, isFolder);
                 })
                 .catch((error) => {
                     console.error('Error al convertir HEIC:', error);
@@ -90,12 +89,138 @@ function handleFileSelection(files, isFolder) {
                 });
         } else {
             // Procesar imágenes que no son HEIC
-            processImage(file, formato, validImages, invalidImages, files.length, isFolder);
+            processImage(file, validImages, invalidImages, files.length, isFolder);
         }
     });
 
-    
-    function processImage(file, formato, validImages, invalidImages, totalFiles, isFolder) {
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             // Convertir la imagen
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' && isFolder ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') validImages.push(listItem);
+    //                 else invalidImages.push(listItem);
+    //                 if (!isFolder && totalFiles === 1 && status === 'no cumple') {
+    //                     const imageContainer = document.getElementById('imageContainer');
+    //                     imageContainer.style.display = 'flex';
+    //                     imageContainer.style.flexDirection = 'row'; // Colocar elementos en fila
+    //                     imageContainer.style.alignItems = 'center';
+    //                     imageContainer.style.justifyContent = 'center'; // Centrar la fila
+    //                     imageContainer.style.gap = '20px'; // Espaciado entre imagen y texto
+    //                     imageContainer.style.marginTop = '20px';
+
+
+    //                     // Mostrar la imagen ajustada
+    //                     const preview = document.getElementById('preview');
+    //                     preview.style.display = 'block';
+    //                     preview.style.maxWidth = '300px';
+    //                     preview.style.maxHeight = '400px';
+    //                     preview.src = jpegUrl;
+
+    //                     // Mostrar las nuevas dimensiones, peso, formato y botón en un contenedor
+    //                     const previewInfo = document.getElementById('previewInfo');
+    //                     if (previewInfo) {
+    //                         previewInfo.style.display = 'block';
+    //                         previewInfo.innerHTML = `
+    //                             <div style="text-align: justify; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    //                                 <p><strong>Vista previa:</strong></p>
+    //                                 <p><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar" style="background: none; border: none; cursor: pointer; font-size: 24px;">
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+    //                     } else {
+    //                         const info = document.createElement('div');
+    //                         info.id = 'previewInfo';
+    //                         info.style.marginLeft = '10px'; // Margen a la izquierda de la imagen
+    //                         info.style.padding = '10px'; // Espaciado interno
+    //                         info.style.border = '1px solid #ccc'; // Bordes
+    //                         info.style.borderRadius = '5px'; // Bordes redondeados
+    //                         info.style.textAlign = 'justify'; // Justificar texto
+    //                         info.style.backgroundColor = '#f9f9f9'; // Fondo claro
+    //                         info.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; // Sombra ligera
+    //                         info.style.display = 'block'; // Bloque para manejar el contenido fácilmente
+
+    //                         info.innerHTML = `
+    //                             <div style="text-align: center;">
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar"
+    //                                     style="background: none;  border-radius: 5px; cursor: pointer; font-size: 18px; padding: 10px; display: inline-flex; align-items: center; gap: 8px;">
+    //                                     <strong style="color: green;">DESCARGAR</strong>
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+
+    //                         imageContainer.appendChild(info);
+    //                     }
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons();
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
+    function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileName = file.name.toLowerCase();
     
@@ -125,15 +250,14 @@ function handleFileSelection(files, isFolder) {
                     status = 'no cumple';
                     errors.push('Formato no compatible');
                 }
-                const nombre = fileName.split('.').slice(0, -1).join('.'); // Obtener el nombre sin la extensión
-
+    
                 convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
                     const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
     
                     const listItem = `
                         <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
                             <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
-                                Nombre: <strong>${nombre}.${formato} </strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+                                Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
                             </p>
                             ${status === 'no cumple' ? `
                             <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
@@ -263,14 +387,226 @@ function handleFileSelection(files, isFolder) {
                 <div style="text-align: center;">
                     <p style="text-align: justify; margin: 5px 10px;"><strong>Dimensiones:</strong> ${info.dimensiones}</p>
                     <p style="text-align: justify; margin: 5px 10px;"><strong>Tamaño:</strong> ${info.tamaño}</p>
-                    <p style="text-align: justify; margin: 5px 10px;"><strong>Formato:</strong>jpg</p>
+                    <p style="text-align: justify; margin: 5px 10px;"><strong>Formato:</strong> ${info.formato}</p>
                 </div>
             `;
+            //     <div style="text-align: center;">
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Dimensiones:</strong> ${info.dimensiones}</p>
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Tamaño:</strong> ${info.tamaño}</p>
+            //     <p style="text-align: justify; margin: 5px 10px;"><strong>Formato:</strong> ${info.formato}</p>
+            // </div>
 
             imageContainer.appendChild(infoContainer);
         }
     }
 
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') {
+    //                     validImages.push(listItem);
+    //                 } else {
+    //                     invalidImages.push(listItem);
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons(); // Enlazar eventos después de actualizar la lista
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
+
+    // function processImage(file, validImages, invalidImages, totalFiles, isFolder) {
+    //     const fileSizeKB = (file.size / 1024).toFixed(2);
+    //     const fileName = file.name.toLowerCase();
+
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (e) {
+    //         const img = new Image();
+
+    //         img.onload = function () {
+    //             const originalWidth = img.width;
+    //             const originalHeight = img.height;
+
+    //             let status = 'cumple';
+    //             const errors = [];
+
+    //             if (originalWidth !== 300 || originalHeight !== 400) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
+    //             }
+
+    //             if (fileSizeKB > 30) {
+    //                 status = 'no cumple';
+    //                 errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
+    //             }
+
+    //             if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+    //                 status = 'no cumple';
+    //                 errors.push('Formato no compatible');
+    //             }
+
+    //             // Convertir la imagen
+    //             convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
+    //                 const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
+
+    //                 const listItem = `
+    //                     <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
+    //                         <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
+    //                             Nombre: <strong>${file.name}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+    //                         </p>
+    //                         ${status === 'no cumple' && isFolder ? `
+    //                         <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
+    //                             <span>Descargar Ajustada</span>
+    //                             <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar">
+    //                                 📥
+    //                             </button>
+    //                         </div>` : ''}
+    //                     </li>
+    //                 `;
+
+    //                 if (status === 'cumple') {
+    //                     validImages.push(listItem);
+    //                     // Mostrar solo la imagen cuando cumple y es una única imagen
+    //                     if (!isFolder && totalFiles === 1) {
+    //                         const imageContainer = document.getElementById('imageContainer');
+    //                         imageContainer.style.display = 'flex';
+    //                         imageContainer.style.justifyContent = 'center';
+    //                         imageContainer.style.marginTop = '20px';
+
+    //                         const preview = document.getElementById('preview');
+    //                         preview.style.display = 'block';
+    //                         preview.style.maxWidth = '300px';
+    //                         preview.style.maxHeight = '400px';
+    //                         preview.src = e.target.result;
+
+    //                         // Asegurarse de que no se muestre información adicional
+    //                         const existingInfo = document.getElementById('previewInfo');
+    //                         if (existingInfo) {
+    //                             existingInfo.remove();
+    //                         }
+    //                     }
+    //                 } else {
+    //                     invalidImages.push(listItem);
+    //                     // Mostrar imagen e información cuando no cumple y es una única imagen
+    //                     if (!isFolder && totalFiles === 1) {
+    //                         const imageContainer = document.getElementById('imageContainer');
+    //                         imageContainer.style.display = 'flex';
+    //                         imageContainer.style.flexDirection = 'row';
+    //                         imageContainer.style.alignItems = 'center';
+    //                         imageContainer.style.justifyContent = 'center';
+    //                         imageContainer.style.gap = '20px';
+    //                         imageContainer.style.marginTop = '20px';
+
+    //                         const preview = document.getElementById('preview');
+    //                         preview.style.display = 'block';
+    //                         preview.style.maxWidth = '300px';
+    //                         preview.style.maxHeight = '400px';
+    //                         preview.src = jpegUrl;
+
+    //                         const info = document.createElement('div');
+    //                         info.id = 'previewInfo';
+    //                         info.style.marginLeft = '10px';
+    //                         info.style.padding = '10px';
+    //                         info.style.border = '1px solid #ccc';
+    //                         info.style.borderRadius = '5px';
+    //                         info.style.textAlign = 'justify';
+    //                         info.style.backgroundColor = '#f9f9f9';
+    //                         info.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+    //                         info.style.display = 'block';
+
+    //                         info.innerHTML = `
+    //                             <div style="text-align: center;">
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nueva Dimensión:</strong> 300x400px</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Tamaño:</strong> ${transformedSizeKB} KB</p>
+    //                                 <p style="text-align: justify; margin: 5px 10px;"><strong>Nuevo Formato:</strong> JPEG</p>
+    //                                 <button class="resize-btn" data-file="${file.name}" data-src="${jpegUrl}" aria-label="Descargar"
+    //                                     style="background: none; border-radius: 5px; cursor: pointer; font-size: 18px; padding: 10px; display: inline-flex; align-items: center; gap: 8px;">
+    //                                     <strong style="color: green;">DESCARGAR</strong>
+    //                                     📥
+    //                                 </button>
+    //                             </div>
+    //                         `;
+
+    //                         // Limpiar el contenedor de información previa
+    //                         const existingInfo = document.getElementById('previewInfo');
+    //                         if (existingInfo) {
+    //                             existingInfo.remove();
+    //                         }
+
+    //                         imageContainer.appendChild(info);
+    //                     }
+    //                 }
+
+    //                 processedCount++;
+    //                 if (processedCount === totalFiles) {
+    //                     updateList(validImages, invalidImages, isFolder);
+    //                     bindResizeButtons();
+    //                     hideLoading();
+    //                 }
+    //             });
+    //         };
+
+    //         img.src = e.target.result;
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // }
 }
 
 function convertToJpeg(image, originalName, callback) {

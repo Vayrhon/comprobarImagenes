@@ -4,6 +4,7 @@ html, body {
     margin: 0;
     overflow-y: auto;
     font-family: Arial, sans-serif;
+
 }
 
 .container {
@@ -33,7 +34,7 @@ button:hover {
     margin-top: 20px;
     text-align: left;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #9a9a9a;
     border-radius: 5px;
     font-size: 0.9em;
     display: none; /* Visible solo para imágenes individuales */
