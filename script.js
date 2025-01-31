@@ -54,6 +54,7 @@ function handleFileSelection(files, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileType = file.type;
         const fileName = file.name.toLowerCase();
+
         const formato = fileName.split('.').pop().toUpperCase(); // Extraer formato del archivo
 
         if (!fileType.startsWith('image/') && !fileName.endsWith('.heic')) {
@@ -94,46 +95,52 @@ function handleFileSelection(files, isFolder) {
         }
     });
 
-    
+
     function processImage(file, formato, validImages, invalidImages, totalFiles, isFolder) {
         const fileSizeKB = (file.size / 1024).toFixed(2);
         const fileName = file.name.toLowerCase();
-    
+
         const reader = new FileReader();
-    
+
         reader.onload = function (e) {
             const img = new Image();
-    
+
             img.onload = function () {
                 const originalWidth = img.width;
                 const originalHeight = img.height;
-    
+
                 let status = 'cumple';
                 const errors = [];
-    
+
                 if (originalWidth !== 300 || originalHeight !== 400) {
                     status = 'no cumple';
                     errors.push(`Dimensiones incorrectas (${originalWidth}x${originalHeight})`);
                 }
-    
+
                 if (fileSizeKB > 30) {
                     status = 'no cumple';
                     errors.push(`Tamaño excede 30 KB (${fileSizeKB} KB)`);
                 }
-    
+
                 if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
                     status = 'no cumple';
                     errors.push('Formato no compatible');
                 }
                 const nombre = fileName.split('.').slice(0, -1).join('.'); // Obtener el nombre sin la extensión
+                const rutValido = validateRut(nombre) ? 'RUT Válido' : 'RUT Inválido';
+                if (rutValido === 'RUT Inválido') {
+                    status = 'no cumple';
+                    errors.push('Rut No Cumple');
+                }
 
                 convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
                     const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
-    
+
+
                     const listItem = `
                         <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
                             <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
-                                Nombre: <strong>${nombre}.${formato} </strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
+                                Nombre: <strong>${nombre}.${formato} </strong> | <strong style="color: ${validateRut(nombre) ? 'green' : 'red'}">${rutValido}</strong> | Tamaño Original: ${fileSizeKB}KB | Dimensiones: ${originalWidth}x${originalHeight}px
                             </p>
                             ${status === 'no cumple' ? `
                             <div style="display: flex; align-items: center; gap: 10px; text-align: justify;">
@@ -144,7 +151,7 @@ function handleFileSelection(files, isFolder) {
                             </div>` : ''}
                         </li>
                     `;
-    
+
                     if (status === 'cumple') {
                         validImages.push(listItem);
                         // Mostrar imagen cuando cumple y es una sola imagen
@@ -162,12 +169,12 @@ function handleFileSelection(files, isFolder) {
                             });
                         }
                     }
-    
+
                     // Mostrar el botón "Descargar Todo" si no es carpeta y hay más de 2 imágenes que no cumplen
                     if (!isFolder && invalidImages.length >= 2) {
                         const bulkResizeContainer = document.getElementById('bulkResizeContainer');
                         bulkResizeContainer.style.display = 'block';
-    
+
                         // Crear botón si no existe
                         let bulkResizeBtn = document.getElementById('bulkResizeBtn');
                         if (!bulkResizeBtn) {
@@ -181,51 +188,98 @@ function handleFileSelection(files, isFolder) {
                             bulkResizeBtn.style.border = 'none';
                             bulkResizeBtn.style.borderRadius = '5px';
                             bulkResizeBtn.style.cursor = 'pointer';
-    
+
                             bulkResizeBtn.addEventListener('click', async function () {
                                 bulkResizeBtn.disabled = true; // Deshabilitar botón
                                 bulkResizeBtn.textContent = 'Procesando....'; // Cambiar texto del botón
                                 bulkResizeBtn.style.cursor = 'not-allowed';
-    
+
                                 const invalidImagesData = Array.from(
                                     document.querySelectorAll('.no-cumple .resize-btn')
                                 ).map((button) => ({
                                     src: button.dataset.src,
                                     fileName: button.dataset.file,
                                 }));
-    
+
                                 await resizeAndDownloadAllInvalid(invalidImagesData);
-    
+
                                 bulkResizeBtn.disabled = false; // Habilitar botón
                                 bulkResizeBtn.textContent = 'Descargar Todo'; // Restaurar texto del botón
                                 bulkResizeBtn.style.cursor = 'pointer';
                             });
-    
+
                             bulkResizeContainer.appendChild(bulkResizeBtn);
                         }
                     }
-    
+
                     processedCount++;
                     if (processedCount === totalFiles) {
                         updateList(validImages, invalidImages, isFolder);
-    
+
                         // Asegurar que el botón no se oculte si hay más de 2 imágenes que no cumplen
                         if (!isFolder && invalidImages.length >= 2) {
                             const bulkResizeContainer = document.getElementById('bulkResizeContainer');
                             bulkResizeContainer.style.display = 'block';
                         }
-    
+
                         bindResizeButtons();
                         hideLoading();
                     }
                 });
             };
-    
+
             img.src = e.target.result;
         };
-    
+
         reader.readAsDataURL(file);
     }
+
+    function validateRut(rut) {
+        // Remove initial zero if present
+        rut = rut.replace(/^0/, '');
+
+        // Remove dots and dashes, convert K to uppercase
+        rut = rut.replace(/[.-]/g, '').toUpperCase();
+
+        // Check if RUT has at least 2 characters
+        if (rut.length < 2) return false;
+
+        // Separate body and verification digit
+        const body = rut.slice(0, -1);
+        const verificationDigit = rut.slice(-1);
+
+        // Validate body contains only numbers
+        if (!/^\d+$/.test(body)) return false;
+
+        // Calculate verification digit
+        let sum = 0;
+        let multiplier = 2;
+
+        // Iterate through body digits from right to left
+        for (let i = body.length - 1; i >= 0; i--) {
+            sum += parseInt(body.charAt(i)) * multiplier;
+            multiplier = multiplier === 7 ? 2 : multiplier + 1;
+        }
+
+        // Calculate expected verification digit
+        const expectedVerificationDigit = 11 - (sum % 11);
+        let calculatedVerificationDigit;
+
+        switch (expectedVerificationDigit) {
+            case 10:
+                calculatedVerificationDigit = 'K';
+                break;
+            case 11:
+                calculatedVerificationDigit = '0';
+                break;
+            default:
+                calculatedVerificationDigit = expectedVerificationDigit.toString();
+        }
+
+        // Compare calculated and provided verification digits
+        return verificationDigit === calculatedVerificationDigit;
+    }
+
     // Función para mostrar una sola imagen
     function displaySingleImage(imageUrl, info) {
         const imageContainer = document.getElementById('imageContainer');
