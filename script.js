@@ -234,50 +234,48 @@ function handleFileSelection(files, isFolder) {
         reader.readAsDataURL(file);
     }
 
-    function validateRut(rut) {
+        function validateRut(rut) {
+        rut = rut.trim();
         // Remove initial zero if present
         rut = rut.replace(/^0/, '');
-
+        
         // Remove dots and dashes, convert K to uppercase
         rut = rut.replace(/[.-]/g, '').toUpperCase();
-
+        
         // Check if RUT has at least 2 characters
         if (rut.length < 2) return false;
-
+        
         // Separate body and verification digit
         const body = rut.slice(0, -1);
         const verificationDigit = rut.slice(-1);
-
+        
         // Validate body contains only numbers
         if (!/^\d+$/.test(body)) return false;
-
+        
         // Calculate verification digit
         let sum = 0;
         let multiplier = 2;
-
+        
         // Iterate through body digits from right to left
         for (let i = body.length - 1; i >= 0; i--) {
             sum += parseInt(body.charAt(i)) * multiplier;
             multiplier = multiplier === 7 ? 2 : multiplier + 1;
         }
-
+        
         // Calculate expected verification digit
-        const expectedVerificationDigit = 11 - (sum % 11);
-        let calculatedVerificationDigit;
-
-        switch (expectedVerificationDigit) {
-            case 10:
-                calculatedVerificationDigit = 'K';
-                break;
-            case 11:
-                calculatedVerificationDigit = '0';
-                break;
-            default:
-                calculatedVerificationDigit = expectedVerificationDigit.toString();
+        let expectedVerificationDigit = 11 - (sum % 11);
+        
+        // Handle verification digit cases
+        if (expectedVerificationDigit === 10) {
+            expectedVerificationDigit = 'K';
+        } else if (expectedVerificationDigit === 11) {
+            expectedVerificationDigit = '0';
+        } else {
+            expectedVerificationDigit = expectedVerificationDigit.toString();
         }
-
+        
         // Compare calculated and provided verification digits
-        return verificationDigit === calculatedVerificationDigit;
+        return verificationDigit === expectedVerificationDigit;
     }
 
     // Función para mostrar una sola imagen
