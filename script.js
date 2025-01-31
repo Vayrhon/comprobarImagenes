@@ -136,7 +136,6 @@ function handleFileSelection(files, isFolder) {
                 convertToJpeg(img, file.name, (jpegBlob, jpegUrl) => {
                     const transformedSizeKB = (jpegBlob.size / 1024).toFixed(2);
 
-
                     const listItem = `
                         <li class="${status === 'cumple' ? 'cumple' : 'no-cumple'}" style="display: flex; justify-content: space-between; align-items: left;">
                             <p style="color: ${status === 'cumple' ? '#155724' : '#721c24'}; text-align: justify;">
@@ -234,7 +233,7 @@ function handleFileSelection(files, isFolder) {
         reader.readAsDataURL(file);
     }
 
-        function validateRut(rut) {
+    function validateRut(rut) {
         rut = rut.trim();
         // Remove initial zero if present
         rut = rut.replace(/^0/, '');
@@ -275,6 +274,8 @@ function handleFileSelection(files, isFolder) {
         }
         
         // Compare calculated and provided verification digits
+        console.log("digito de la foto", verificationDigit)
+        console.log("digito del calculo", expectedVerificationDigit)
         return verificationDigit === expectedVerificationDigit;
     }
 
